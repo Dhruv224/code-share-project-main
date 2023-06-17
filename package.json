@@ -1,0 +1,41 @@
+{
+  "name": "codeshare",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@codemirror/lang-cpp": "^6.0.2",
+    "@codemirror/lang-javascript": "^6.1.4",
+    "@uiw/codemirror-theme-darcula": "^4.19.9",
+    "@uiw/codemirror-theme-dracula": "^4.19.9",
+    "@uiw/react-codemirror": "^4.19.9",
+    "codemirror": "^5.65.12",
+    "express": "^4.18.2",
+    "peerjs": "^1.4.7",
+    "react": "^18.2.0",
+    "react-avatar": "^5.0.3",
+    "react-dom": "^18.2.0",
+    "react-icons": "^4.8.0",
+    "react-router-dom": "^6.9.0",
+    "react-toastify": "^9.1.1",
+    "save": "^2.9.0",
+    "simple-peer": "^9.11.1",
+    "socket.io": "^4.6.1",
+    "socket.io-client": "^4.6.1",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.27",
+    "@types/react-dom": "^18.0.10",
+    "@vitejs/plugin-react": "^3.1.0",
+    "autoprefixer": "^10.4.14",
+    "postcss": "^8.4.21",
+    "tailwindcss": "^3.2.7",
+    "vite": "^4.1.0"
+  }
+}
