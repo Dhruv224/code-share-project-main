@@ -9,26 +9,35 @@ import 'react-toastify/dist/ReactToastify.css';
 import {RxHamburgerMenu, RxCross1} from 'react-icons/rx';
 
 function EditorPage() {
+    // Extracting roomId information from URL
     const {roomId} = useParams();
+
+    // Extracting data sent along with useNavigate() Hook
     const location = useLocation();
+
+    // Navigating to home page after leave (different from <Navigate /> component)
     const navigate = useNavigate();
 
+    // for displaying users who have joined
     const [users, setUsers] = useState([]);
+
+    // for responsive design
     const [mobile, setMobile] = useState(true);
 
+    // if data will change then component will not re-render + can access DOM elemets and property
     const socketRef = useRef(null);
     const codeRef = useRef(null);
 
     useEffect(() => {
         const init = async () => {
+            // connecting socket.io-client to socket.io server
             socketRef.current = await socketInit();
 
+            // Handling Errors
             socketRef.current.on('connect_error', (err) => errorInfo(err));
             socketRef.current.on('connect_failed', (err) => errorInfo(err));
-
+            
             const errorInfo = (e) => {
-                console.log(e);
-
                 toast.error('Socket connection failed. Try again later', {
                     position: "top-right",
                     autoClose: 1500,
@@ -43,12 +52,16 @@ function EditorPage() {
                 navigate('/');
             }
 
+            // Sending join event to server from client + sending roomId and userName
             socketRef.current.emit('join', {
                 roomId,
-                userName: location.state?.userName
+                userName: location.state?.userName,
             });
 
+            // Server will send confirmation that user is joined
             socketRef.current.on('joined', ({clients, userName, socketId}) => {
+                // we will not show a toast msg to you 
+                // if you entered Dhruv and click enter then it will not sow that Dhruv joined room to you
                 if(userName !== location.state?.userName){
                     toast.success(`${userName} joined room`, {
                         position: "top-right",
@@ -62,13 +75,18 @@ function EditorPage() {
                     });
                 }
 
+                // setting up all users list
                 setUsers(clients);
-                socketRef.current.emit('syncCode', {
-                    code: codeRef.current,
-                    socketId
-                });
+
+                if(codeRef.current !== null){
+                    socketRef.current.emit('syncCode', {
+                        socketId,
+                        code: codeRef.current,
+                    });
+                }
             });
 
+            // If user disconnect from the server
             socketRef.current.on('disconnected', ({socketId, userName}) => {
                 toast.warn(`${userName} left the room`, {
                     position: "top-right",
@@ -81,6 +99,7 @@ function EditorPage() {
                     theme: "light",
                 });
 
+                // removing user from userlist
                 setUsers((prev) => {
                     return prev.filter((currUser) => currUser.socketId !== socketId);
                 });
@@ -88,14 +107,9 @@ function EditorPage() {
         };
 
         init();
-
-        return () => {
-            socketRef.current.disconnect();
-            socketRef.current.off('joined');
-            socketRef.current.off('disconnected');
-        }
     }, []);
 
+    // function for copying roomId to clipboard
     const copyRoomId = () => {
         navigator.clipboard.writeText(roomId);
         toast.success('ROOM ID copied sucessfully', {
@@ -110,10 +124,13 @@ function EditorPage() {
         });
     }
 
+    // function for leaving room
     const leaveRoom = () => {
         navigate('/');
     }
 
+    // if userName not found then navigating to home page
+    // <Navigate to='PATH'/> inbuilt component in react-router-dom
     if(!location.state){
         return <Navigate to='/' />
     }
@@ -158,7 +175,8 @@ function EditorPage() {
         </div>
 
         <div className='bg-gray-800 lg:overflow-x-hidden w-[100vw] lg:w-[89%] h-[100vh]'>
-            <Editor socketRef={socketRef} roomId={roomId} onCodeChange={(code) => {
+            <Editor socketRef={socketRef} roomId={roomId} 
+            onCodeChange={(code) => {
                 codeRef.current = code;
             }}/>
         </div>
